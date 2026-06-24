@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="نوبت‌بازی">
+<meta name="theme-color" content="#1A1A2E">
+<title>نوبت‌بازی</title>
+
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ============ SETUP SCREEN ============ -->
+  <div class="screen" id="setupScreen">
+    <div class="eyebrow">بازی خونگی</div>
+    <h1 class="title">نوبت‌بازی 🎮</h1>
+    <p class="subtitle">تنظیم کن، دسته رو بده، نوبت رو رعایت کنید</p>
+
+    <div class="mode-toggle">
+      <button id="modeSingleBtn" class="active">👤 تکی</button>
+      <button id="modeGroupBtn">👥 گروهی (۲ گروه)</button>
+    </div>
+
+    <div class="card">
+      <div class="card-label">⏱ مدت هر نوبت</div>
+      <div class="pill-row" id="durationPills">
+        <button class="pill" data-val="10">۱۰ دقیقه</button>
+        <button class="pill active" data-val="20">۲۰ دقیقه</button>
+        <button class="pill" data-val="30">۳۰ دقیقه</button>
+        <button class="pill" data-val="45">۴۵ دقیقه</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">🔁 تعداد دورهای آلارم</div>
+      <div class="pill-row" id="roundsPills">
+        <button class="pill" data-val="4">۴ بار</button>
+        <button class="pill" data-val="6">۶ بار</button>
+        <button class="pill active" data-val="8">۸ بار</button>
+        <button class="pill" data-val="12">۱۲ بار</button>
+      </div>
+    </div>
+
+    <!-- SINGLE MODE -->
+    <div class="card" id="singleModeCard">
+      <div class="card-label">👦 تعداد بازیکن‌ها</div>
+      <div class="count-row" style="margin-bottom:14px;">
+        <button class="count-btn" id="countMinus">−</button>
+        <div class="count-display" id="countDisplay">۲</div>
+        <button class="count-btn" id="countPlus">+</button>
+      </div>
+      <div class="card-label">اسم بازیکن‌ها (به ترتیب نوبت)</div>
+      <div class="players-scroll" id="playersScroll"></div>
+      <div class="scroll-hint">⇠ برای دیدن همه بازیکن‌ها به چپ بکش</div>
+    </div>
+
+    <!-- GROUP MODE -->
+    <div class="card hidden" id="groupModeCard" style="background:transparent; padding:0;">
+      <div class="group-card g1">
+        <div class="group-card-head">
+          <div class="group-card-title">گروه ۱</div>
+          <input class="group-name-input" id="group1NameInput" value="گروه ۱">
+        </div>
+        <div class="count-row" style="margin-bottom:10px;">
+          <button class="count-btn" id="g1CountMinus">−</button>
+          <div class="count-display" id="g1CountDisplay">۲</div>
+          <button class="count-btn" id="g1CountPlus">+</button>
+        </div>
+        <div class="players-scroll" id="g1PlayersScroll"></div>
+      </div>
+      <div class="group-card g2">
+        <div class="group-card-head">
+          <div class="group-card-title">گروه ۲</div>
+          <input class="group-name-input" id="group2NameInput" value="گروه ۲">
+        </div>
+        <div class="count-row" style="margin-bottom:10px;">
+          <button class="count-btn" id="g2CountMinus">−</button>
+          <div class="count-display" id="g2CountDisplay">۲</div>
+          <button class="count-btn" id="g2CountPlus">+</button>
+        </div>
+        <div class="players-scroll" id="g2PlayersScroll"></div>
+      </div>
+      <div class="scroll-hint">⇠ برای دیدن همه اسم‌ها به چپ بکش</div>
+    </div>
+
+    <!-- AUDIO UPLOAD -->
+    <div class="card">
+      <div class="card-label">🔊 صدای اعلام نوبت (اختیاری)</div>
+      <div class="audio-upload-row">
+        <button class="upload-btn" id="uploadBtn">+ آپلود فایل صوتی «نوبت نفر بعدی شده»</button>
+        <button class="clear-audio-btn hidden" id="clearAudioBtn">×</button>
+      </div>
+      <input type="file" id="audioFileInput" accept="audio/*" class="hidden">
+      <button class="audio-test-btn" id="testAudioBtn">▶ تست پخش صدا</button>
+    </div>
+
+    <button class="start-btn" id="startBtn">شروع بازی</button>
+    <div class="hint">یک دقیقه قبل از پایان نوبت، هشدار صدا و لرزش می‌دهیم. بعد از تمام دورها، اعلام می‌کنیم که دستگاه را خاموش کنید.</div>
+  </div>
+
+  <!-- ============ PLAY SCREEN ============ -->
+  <div class="screen hidden" id="playScreen">
+    <div class="round-info" id="roundInfo">دور ۱ از ۸</div>
+    <div class="stage">
+      <div class="ring-wrap">
+        <svg viewBox="0 0 220 220">
+          <circle class="ring-track" cx="110" cy="110" r="98"></circle>
+          <circle class="ring-progress" id="ringProgress" cx="110" cy="110" r="98"
+            stroke-dasharray="615.75" stroke-dashoffset="0"></circle>
+        </svg>
+        <div class="ring-center">
+          <div class="turn-label" id="turnLabel">نوبت نفر اول</div>
+          <div class="player-name" id="playerName">—</div>
+          <div class="time-left" id="timeLeft">۲۰:۰۰</div>
+        </div>
+      </div>
+      <div class="group-members hidden" id="groupMembers"></div>
+      <div class="next-up" id="nextUp">نفر بعد: <b>—</b></div>
+    </div>
+    <div class="controls">
+      <button class="ctrl-btn" id="pauseBtn">⏸ توقف</button>
+      <button class="ctrl-btn primary" id="skipBtn">⏭ نوبت بعد</button>
+      <button class="ctrl-btn danger" id="stopBtn">⏹ پایان</button>
+    </div>
+  </div>
+
+  <!-- ============ END SCREEN ============ -->
+  <div class="screen hidden" id="endScreen">
+    <div class="end-icon">🔌</div>
+    <div class="end-title">بازی به پایان رسید</div>
+    <div class="end-sub">لطفاً دستگاه را خاموش کنید.</div>
+    <button class="banner-btn" id="restartBtn">شروع دوباره</button>
+  </div>
+
+  <!-- ============ BANNER OVERLAY ============ -->
+  <div class="banner-overlay hidden" id="banner">
+    <div class="banner-icon" id="bannerIcon">⏰</div>
+    <div class="banner-eyebrow" id="bannerEyebrow">هشدار</div>
+    <div class="banner-title gold" id="bannerTitle">یک دقیقه مونده!</div>
+    <div class="banner-sub" id="bannerSub">آماده باش، نفر بعدی</div>
+    <button class="banner-btn" id="bannerBtn">باشه، فهمیدم</button>
+  </div>
+
+</div>
+
+<script src="app.js"></script>
+<script>
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(function(err){
+        console.warn('SW registration failed:', err);
+      });
+    });
+  }
+</script>
+</body>
+</html>
